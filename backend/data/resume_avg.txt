@@ -1,0 +1,13 @@
+Candidate: Priya Verma
+
+Summary:
+Software developer with 2 years of experience in Python and data analysis, with
+some exposure to machine learning projects during academic work.
+
+Experience:
+- Built internal dashboards and automation scripts in Python
+- Completed a college capstone project on sentiment analysis
+- Worked with SQL, Pandas, and REST APIs
+
+Skills:
+Python, SQL, Pandas, Data Analysis, Basic Machine Learning, Git

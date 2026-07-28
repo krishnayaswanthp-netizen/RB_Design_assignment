@@ -1,0 +1,14 @@
+Candidate: Rahul Sharma
+
+Summary:
+AI Engineer with 4+ years of experience building machine learning and LLM-based
+applications using Python, FastAPI, LangChain, vector databases, and OpenAI APIs.
+
+Experience:
+- Built a resume ranking platform that screened 20,000+ resumes using NLP and LLMs
+- Developed production Python services for document parsing and information extraction
+- Integrated prompt templates, evaluation workflows, and human review loops
+- Deployed ML services on AWS using Docker and CI/CD pipelines
+
+Skills:
+Python, Machine Learning, NLP, LangChain, OpenAI API, FastAPI, Docker, AWS, Git

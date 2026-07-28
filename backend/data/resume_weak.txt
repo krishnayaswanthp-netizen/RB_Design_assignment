@@ -1,0 +1,13 @@
+Candidate: Kiran Patel
+
+Summary:
+Customer support professional transitioning into technology with beginner-level
+programming knowledge and limited project experience.
+
+Experience:
+- Managed customer queries and reporting tasks
+- Completed an introductory Python course
+- Built a small personal portfolio website
+
+Skills:
+Basic Python, MS Excel, Communication, HTML, CSS

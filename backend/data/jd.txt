@@ -1,0 +1,20 @@
+Role: AI/ML Engineer
+
+We are looking for an AI/ML Engineer with experience in Python, machine learning,
+NLP, and LLM application development. The ideal candidate should be comfortable
+working with LangChain-style orchestration, API integrations, prompt design, and
+evaluation of AI system outputs.
+
+Key responsibilities:
+- Build AI-powered applications and internal tools
+- Work with LLM APIs and prompt engineering workflows
+- Process and analyze structured and unstructured data
+- Collaborate with product and engineering teams
+- Deploy and monitor ML/AI solutions
+
+Required skills:
+- Strong Python programming
+- Experience with machine learning fundamentals
+- Familiarity with NLP and LLM concepts
+- Experience with Git and software engineering best practices
+- Good communication and problem-solving skills
