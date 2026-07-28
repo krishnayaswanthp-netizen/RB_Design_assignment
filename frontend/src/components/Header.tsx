@@ -19,68 +19,73 @@ export function Header({
   const isPro = planTier === 'pro'
 
   return (
-    <header className="flex flex-col gap-4 border-b border-slate-200/80 bg-white/80 px-5 py-4 backdrop-blur lg:flex-row lg:items-center lg:justify-between">
-      <Link to="/" className="group inline-block">
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-950 transition group-hover:text-cyan-600">
-          AI Resume Screener
-        </h1>
-        <p className="text-sm text-slate-500">Candidate fit analysis dashboard</p>
-      </Link>
-
-      <div className="flex flex-wrap items-center gap-3">
-        <span
-          className={`rounded-full px-3 py-1 text-sm font-semibold ${
-            isPro
-              ? 'bg-emerald-100 text-emerald-700'
-              : 'bg-amber-100 text-amber-700'
-          }`}
-        >
-          {isPro ? 'Pro' : 'Free'}
-        </span>
-        <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-medium text-slate-700">
-          {isPro ? 'Unlimited' : `${usageCount} / 5 used`}
-        </span>
-
-        <Link
-          to="/"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-        >
-          <Home className="h-4 w-4 text-slate-600" />
-          Landing Page
+    <header className="sticky top-0 z-40 border-b border-[#E6E0D8] bg-[#F8F6F2]/90 px-6 py-4 backdrop-blur-md transition-colors">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <Link to="/" className="group inline-block focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] rounded-lg">
+          <h1 className="font-serif text-2xl font-semibold tracking-tight text-[#2F2F2F] transition-colors group-hover:text-[#707B63] sm:text-3xl">
+            AI Resume Screener
+          </h1>
+          <p className="text-xs font-sans tracking-wide text-[#66635F]">
+            Candidate Fit Analysis &amp; ATS Evaluation
+          </p>
         </Link>
 
-        <Link
-          to="/profile"
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-        >
-          <UserIcon className="h-4 w-4 text-slate-600" />
-          Profile
-        </Link>
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className={`rounded-full px-3.5 py-1 text-xs sm:text-sm font-semibold tracking-wide ${
+              isPro
+                ? 'bg-[#707B63]/15 text-[#4A6B53] border border-[#707B63]/30'
+                : 'bg-[#F2EEE7] text-[#C28E46] border border-[#E6E0D8]'
+            }`}
+          >
+            {isPro ? 'Pro Member' : 'Free Tier'}
+          </span>
 
-        {isPro && onManageBilling ? (
+          <span className="rounded-full bg-[#F2EEE7] px-3.5 py-1 text-xs sm:text-sm font-medium text-[#66635F] border border-[#E6E0D8]">
+            {isPro ? 'Unlimited Access' : `${usageCount} / 5 Used`}
+          </span>
+
+          <Link
+            to="/"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-2 text-xs sm:text-sm font-medium text-[#2F2F2F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
+          >
+            <Home className="h-3.5 w-3.5 text-[#66635F]" />
+            Landing Page
+          </Link>
+
+          <Link
+            to="/profile"
+            className="inline-flex items-center gap-2 rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-2 text-xs sm:text-sm font-medium text-[#2F2F2F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
+          >
+            <UserIcon className="h-3.5 w-3.5 text-[#66635F]" />
+            Profile
+          </Link>
+
+          {isPro && onManageBilling ? (
+            <button
+              type="button"
+              onClick={onManageBilling}
+              disabled={managingBilling}
+              className="inline-flex items-center gap-2 rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-2 text-xs sm:text-sm font-medium text-[#2F2F2F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {managingBilling ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin text-[#66635F]" />
+              ) : (
+                <CreditCard className="h-3.5 w-3.5 text-[#66635F]" />
+              )}
+              Manage Billing
+            </button>
+          ) : null}
+
           <button
             type="button"
-            onClick={onManageBilling}
-            disabled={managingBilling}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-70"
+            onClick={onLogout}
+            className="inline-flex items-center gap-2 rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-2 text-xs sm:text-sm font-medium text-[#66635F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:text-[#2F2F2F] hover:border-[#E6E0D8] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
           >
-            {managingBilling ? (
-              <Loader2 className="h-4 w-4 animate-spin text-slate-600" />
-            ) : (
-              <CreditCard className="h-4 w-4 text-slate-600" />
-            )}
-            Manage Billing
+            <LogOut className="h-3.5 w-3.5" />
+            Logout
           </button>
-        ) : null}
-
-        <button
-          type="button"
-          onClick={onLogout}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
-        >
-          <LogOut className="h-4 w-4" />
-          Logout
-        </button>
+        </div>
       </div>
     </header>
   )

@@ -3,6 +3,7 @@ import type { User } from '@supabase/supabase-js'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.mjs?url'
 import mammoth from 'mammoth/mammoth.browser'
+import { motion } from 'framer-motion'
 import {
   AlertCircle,
   ArrowUpRight,
@@ -95,7 +96,6 @@ export function Dashboard({ user }: DashboardProps) {
 
   async function fetchHistory() {
     try {
-      // Query evaluations table first
       const { data: evalData } = await supabase
         .from('evaluations')
         .select('*')
@@ -107,7 +107,6 @@ export function Dashboard({ user }: DashboardProps) {
         return
       }
 
-      // Fallback to reviews table
       const { data: reviewData } = await supabase
         .from('reviews')
         .select('*')
@@ -288,7 +287,6 @@ export function Dashboard({ user }: DashboardProps) {
       setUsageCount(data.usage_count)
       setPlanTier(data.plan_tier)
 
-      // Save to Supabase evaluations table for persistent memory
       try {
         await supabase.from('evaluations').insert([
           {
@@ -412,7 +410,7 @@ export function Dashboard({ user }: DashboardProps) {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 text-slate-950">
+    <main className="min-h-screen bg-[#F8F6F2] font-sans text-[#2F2F2F] selection:bg-[#707B63]/20 selection:text-[#2F2F2F]">
       <Header
         planTier={planTier}
         usageCount={usageCount}
@@ -421,80 +419,89 @@ export function Dashboard({ user }: DashboardProps) {
         managingBilling={managingBilling}
       />
 
-      <div className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
+      <div className="mx-auto max-w-7xl px-6 py-10">
+        {/* Payment Notice Banner */}
         {notice ? (
-          <div className="mb-5 flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-800">
-            <CheckCircle2 className="h-5 w-5" />
+          <div className="mb-6 flex items-center gap-2.5 rounded-xl border border-[#4A6B53]/30 bg-[#4A6B53]/10 px-4 py-3 text-xs font-medium text-[#4A6B53]">
+            <CheckCircle2 className="h-4 w-4 shrink-0 text-[#4A6B53]" />
             {notice}
           </div>
         ) : null}
 
+        {/* Upgrade Banner for Free Users */}
         {planTier === 'free' ? (
-          <section className="mb-6 flex flex-col gap-4 rounded-2xl border border-cyan-200 bg-white/80 p-5 shadow-sm backdrop-blur lg:flex-row lg:items-center lg:justify-between">
+          <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-6 shadow-[0_6px_24px_rgba(47,47,47,0.03)] lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h2 className="text-lg font-semibold text-slate-950">
-                Upgrade to Pro for $15/mo
+              <h2 className="font-serif text-xl font-semibold text-[#2F2F2F] sm:text-2xl">
+                Upgrade to Pro Membership ($15/mo)
               </h2>
-              <p className="mt-1 text-sm text-slate-600">
-                {remaining} free reviews remaining. Pro unlocks unlimited evaluations.
+              <p className="mt-1 text-xs sm:text-sm text-[#66635F]">
+                {remaining} free evaluations remaining. Pro unlocks unlimited evaluations.
               </p>
             </div>
             <button
               type="button"
               onClick={handleUpgrade}
               disabled={upgrading}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#2F2F2F] px-5 py-2.5 text-xs sm:text-sm font-semibold text-[#F8F6F2] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] disabled:cursor-not-allowed disabled:opacity-60"
             >
               {upgrading ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
+                <Loader2 className="h-4 w-4 animate-spin text-[#F8F6F2]" />
               ) : (
                 <ArrowUpRight className="h-4 w-4" />
               )}
-              Upgrade
+              Upgrade Now
             </button>
           </section>
         ) : null}
 
+        {/* Error Alert */}
         {error ? (
-          <div className="mb-5 flex items-center gap-2 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
-            <AlertCircle className="h-5 w-5" />
+          <div className="mb-6 flex items-center gap-2.5 rounded-xl border border-[#A85A48]/30 bg-[#A85A48]/10 px-4 py-3 text-xs font-medium text-[#A85A48]">
+            <AlertCircle className="h-4 w-4 shrink-0 text-[#A85A48]" />
             {error}
           </div>
         ) : null}
 
-        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+        {/* Workspace Form and ATS Results Grid */}
+        <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
+          {/* Resume & Job Description Input Form */}
           <form
             onSubmit={handleReview}
-            className="rounded-2xl border border-slate-200 bg-white/85 p-5 shadow-sm backdrop-blur"
+            className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]"
           >
-            <div className="mb-5 flex items-center gap-2">
-              <Sparkles className="h-5 w-5 text-cyan-600" />
-              <h2 className="text-lg font-semibold">Resume analysis</h2>
+            <div className="mb-6 flex items-center gap-2.5">
+              <Sparkles className="h-4.5 w-4.5 text-[#707B63]" />
+              <h2 className="font-serif text-2xl font-semibold text-[#2F2F2F] sm:text-3xl">Resume Analysis</h2>
             </div>
 
-            <div className="grid gap-4">
+            <div className="space-y-6">
               <label className="block">
-                <span className="text-sm font-medium text-slate-700">Job Description</span>
+                <span className="text-xs font-medium uppercase tracking-wider text-[#66635F]">
+                  Job Description &amp; Role Requirements
+                </span>
                 <textarea
                   required
                   value={jobDescription}
                   onChange={(event) => setJobDescription(event.target.value)}
-                  className="mt-2 min-h-56 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 outline-none transition focus:border-cyan-500 focus:bg-white"
-                  placeholder="Paste the role requirements, skills, and experience expectations."
+                  className="mt-2 min-h-52 w-full resize-y rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] px-4 py-3 text-sm sm:text-base leading-relaxed text-[#2F2F2F] outline-none transition duration-200 placeholder:text-[#66635F]/60 focus:border-[#707B63] focus:bg-[#FCFBF8] focus-visible:ring-2 focus-visible:ring-[#707B63]"
+                  placeholder="Paste the role requirements, required skills, and candidate background expectations."
                 />
               </label>
 
               <section>
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <span className="text-sm font-medium text-slate-700">Resume Content</span>
-                  <div className="flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="text-xs font-medium uppercase tracking-wider text-[#66635F]">
+                    Resume Content
+                  </span>
+                  <div className="flex rounded-lg border border-[#E6E0D8] bg-[#F2EEE7] p-1">
                     <button
                       type="button"
                       onClick={() => setResumeMode('upload')}
-                      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                      className={`rounded-md px-3 py-1 text-xs sm:text-sm font-medium transition ${
                         resumeMode === 'upload'
-                          ? 'bg-white text-slate-950 shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-[#FCFBF8] text-[#2F2F2F] shadow-sm'
+                          : 'text-[#66635F] hover:text-[#2F2F2F]'
                       }`}
                     >
                       Upload File
@@ -502,10 +509,10 @@ export function Dashboard({ user }: DashboardProps) {
                     <button
                       type="button"
                       onClick={() => setResumeMode('paste')}
-                      className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
+                      className={`rounded-md px-3 py-1 text-xs sm:text-sm font-medium transition ${
                         resumeMode === 'paste'
-                          ? 'bg-white text-slate-950 shadow-sm'
-                          : 'text-slate-500 hover:text-slate-800'
+                          ? 'bg-[#FCFBF8] text-[#2F2F2F] shadow-sm'
+                          : 'text-[#66635F] hover:text-[#2F2F2F]'
                       }`}
                     >
                       Paste Text
@@ -524,15 +531,15 @@ export function Dashboard({ user }: DashboardProps) {
                     />
 
                     {uploadedResume ? (
-                      <div className="rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
+                      <div className="rounded-xl border border-[#707B63]/30 bg-[#F2EEE7]/80 p-5">
                         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-center gap-3">
-                            <div className="rounded-xl bg-white p-3 text-cyan-700 shadow-sm">
-                              <FileText className="h-6 w-6" />
+                            <div className="rounded-lg bg-[#FCFBF8] p-3 text-[#707B63] shadow-sm border border-[#E6E0D8]">
+                              <FileText className="h-5 w-5" />
                             </div>
                             <div>
-                              <p className="font-semibold text-slate-950">{uploadedResume.name}</p>
-                              <p className="text-sm text-slate-600">
+                              <p className="font-serif text-base font-semibold text-[#2F2F2F]">{uploadedResume.name}</p>
+                              <p className="text-xs text-[#66635F]">
                                 {formatFileSize(uploadedResume.size)} parsed successfully
                               </p>
                             </div>
@@ -541,16 +548,16 @@ export function Dashboard({ user }: DashboardProps) {
                             <button
                               type="button"
                               onClick={() => fileInputRef.current?.click()}
-                              className="rounded-xl border border-cyan-200 bg-white px-4 py-2 text-sm font-medium text-cyan-700 transition hover:bg-cyan-100"
+                              className="rounded-lg border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-1.5 text-xs font-medium text-[#2F2F2F] transition hover:border-[#707B63]"
                             >
                               Replace File
                             </button>
                             <button
                               type="button"
                               onClick={removeUploadedFile}
-                              className="inline-flex items-center gap-1 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+                              className="inline-flex items-center gap-1 rounded-lg border border-[#E6E0D8] bg-[#FCFBF8] px-3.5 py-1.5 text-xs font-medium text-[#66635F] transition hover:bg-[#F2EEE7]"
                             >
-                              <X className="h-4 w-4" />
+                              <X className="h-3.5 w-3.5" />
                               Remove
                             </button>
                           </div>
@@ -564,22 +571,22 @@ export function Dashboard({ user }: DashboardProps) {
                         }}
                         onDragLeave={() => setIsDragging(false)}
                         onDrop={handleDrop}
-                        className={`flex min-h-56 cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition ${
+                        className={`flex min-h-52 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-6 py-8 text-center transition-all duration-300 ${
                           isDragging
-                            ? 'border-cyan-500 bg-cyan-50'
-                            : 'border-slate-300 bg-slate-50 hover:border-cyan-400 hover:bg-cyan-50/60'
+                            ? 'border-[#707B63] bg-[#F2EEE7]'
+                            : 'border-[#E6E0D8] bg-[#F8F6F2] hover:border-[#707B63]/60 hover:bg-[#F2EEE7]/60'
                         }`}
                         onClick={() => fileInputRef.current?.click()}
                       >
                         {parsingFile ? (
-                          <Loader2 className="h-10 w-10 animate-spin text-cyan-600" />
+                          <Loader2 className="h-8 w-8 animate-spin text-[#707B63]" />
                         ) : (
-                          <UploadCloud className="h-10 w-10 text-cyan-600" />
+                          <UploadCloud className="h-8 w-8 text-[#707B63]" />
                         )}
-                        <p className="mt-4 font-semibold text-slate-950">
-                          {parsingFile ? 'Parsing resume...' : 'Drop resume here or browse'}
+                        <p className="mt-3 font-serif text-base font-semibold text-[#2F2F2F] sm:text-lg">
+                          {parsingFile ? 'Parsing candidate document...' : 'Drop resume file here or browse'}
                         </p>
-                        <p className="mt-2 text-sm text-slate-500">PDF, DOCX, or TXT files</p>
+                        <p className="mt-1 text-xs text-[#66635F]">Supports PDF, DOCX, or TXT documents</p>
                       </div>
                     )}
                   </div>
@@ -591,8 +598,8 @@ export function Dashboard({ user }: DashboardProps) {
                       setResumeText(event.target.value)
                       setUploadedResume(null)
                     }}
-                    className="min-h-56 w-full resize-y rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm leading-6 outline-none transition focus:border-cyan-500 focus:bg-white"
-                    placeholder="Paste the candidate resume text."
+                    className="min-h-52 w-full resize-y rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] px-4 py-3 text-sm sm:text-base leading-relaxed text-[#2F2F2F] outline-none transition focus:border-[#707B63] focus:bg-[#FCFBF8] focus-visible:ring-2 focus-visible:ring-[#707B63]"
+                    placeholder="Paste candidate resume text here."
                   />
                 )}
               </section>
@@ -601,56 +608,78 @@ export function Dashboard({ user }: DashboardProps) {
             <button
               type="submit"
               disabled={loading || parsingFile || !canAnalyze}
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-cyan-600 px-5 py-3 font-semibold text-white transition hover:bg-cyan-700 disabled:cursor-not-allowed disabled:opacity-70"
+              className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-[#2F2F2F] px-5 py-3.5 text-xs sm:text-sm font-semibold text-[#F8F6F2] shadow-[0_4px_16px_rgba(47,47,47,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : null}
-              Analyze Resume
+              {loading ? <Loader2 className="h-4 w-4 animate-spin text-[#F8F6F2]" /> : null}
+              Evaluate Candidate Fit
             </button>
           </form>
 
-          <section className="rounded-2xl border border-slate-200 bg-white/85 p-5 shadow-sm backdrop-blur">
-            <h2 className="text-lg font-semibold">ATS feedback</h2>
+          {/* Hero ATS Result Screen */}
+          <section className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
+            <h2 className="font-serif text-2xl font-semibold text-[#2F2F2F] sm:text-3xl">ATS Evaluation Result</h2>
 
             {result ? (
-              <div className="mt-6 space-y-6">
-                <div>
-                  <div className="flex items-end justify-between">
-                    <p className="text-sm font-medium text-slate-600">Match Score</p>
-                    <p className="text-4xl font-bold text-slate-950">{result.score}%</p>
-                  </div>
-                  <div className="mt-3 h-3 overflow-hidden rounded-full bg-slate-200">
-                    <div
-                      className="h-full rounded-full bg-cyan-600 transition-all"
-                      style={{ width: `${Math.min(Math.max(result.score, 0), 100)}%` }}
-                    />
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35 }}
+                className="mt-6 space-y-6"
+              >
+                {/* Circular Score Gauge & Readout */}
+                <div className="flex flex-col items-center rounded-2xl border border-[#E6E0D8] bg-[#F8F6F2] p-6 text-center">
+                  <div className="relative flex h-32 w-32 items-center justify-center">
+                    <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
+                      <path
+                        className="text-[#E6E0D8]"
+                        strokeWidth="3"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                      <path
+                        className="text-[#707B63] transition-all duration-1000 ease-out"
+                        strokeDasharray={`${Math.min(Math.max(result.score, 0), 100)}, 100`}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        stroke="currentColor"
+                        fill="none"
+                        d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                      />
+                    </svg>
+                    <div className="absolute flex flex-col items-center">
+                      <span className="font-serif text-3xl font-bold text-[#2F2F2F] sm:text-4xl">{result.score}%</span>
+                      <span className="text-[10px] uppercase tracking-wider text-[#66635F]">Match</span>
+                    </div>
                   </div>
                 </div>
 
-                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                  <h3 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-500">
-                    Detailed Feedback
+                {/* Recruiter Feedback Details */}
+                <div className="rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] p-5">
+                  <h3 className="mb-3 font-serif text-sm font-semibold uppercase tracking-wider text-[#66635F]">
+                    Recruiter Reasoning &amp; Breakdown
                   </h3>
-                  <div className="whitespace-pre-wrap text-sm leading-7 text-slate-700">
+                  <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed text-[#2F2F2F]">
                     {result.feedback}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ) : (
-              <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm leading-6 text-slate-500">
-                Submit a resume to generate score, reasoning, matched skills, and gaps.
+              <div className="mt-8 rounded-xl border border-dashed border-[#E6E0D8] bg-[#F8F6F2] p-8 text-center text-xs sm:text-sm leading-relaxed text-[#66635F]">
+                Upload a candidate resume and job description to generate fit score, strengths, and recruiter breakdown.
               </div>
             )}
           </section>
         </div>
 
-        {/* Evaluation History Section */}
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white/85 p-6 shadow-sm backdrop-blur">
-          <div className="flex items-center gap-2">
-            <History className="h-5 w-5 text-cyan-600" />
-            <h2 className="text-lg font-semibold text-slate-950">Evaluation Memory &amp; History</h2>
+        {/* Evaluation Memory History Section */}
+        <section className="mt-10 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
+          <div className="flex items-center gap-2.5">
+            <History className="h-4.5 w-4.5 text-[#707B63]" />
+            <h2 className="font-serif text-2xl font-semibold text-[#2F2F2F] sm:text-3xl">Evaluation Memory &amp; History</h2>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
-            Click on any past evaluation scan below to view its score and feedback.
+          <p className="mt-1 text-xs sm:text-sm text-[#66635F]">
+            Click on any previous evaluation below to inspect past match score and detailed feedback.
           </p>
 
           {history.length > 0 ? (
@@ -661,20 +690,20 @@ export function Dashboard({ user }: DashboardProps) {
                   <div
                     key={item.id}
                     onClick={() => loadHistoryItem(item)}
-                    className="group cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-cyan-500 hover:bg-cyan-50/50 hover:shadow-md"
+                    className="group cursor-pointer rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] p-4 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/50 hover:bg-[#FCFBF8] hover:shadow-[0_4px_16px_rgba(47,47,47,0.04)]"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-800">
+                      <span className="rounded-full bg-[#707B63]/15 px-3 py-0.5 text-[10px] font-bold text-[#4A6B53]">
                         {score}% Match
                       </span>
                       {item.created_at ? (
-                        <span className="flex items-center gap-1 text-xs text-slate-400">
-                          <Clock className="h-3 w-3" />
+                        <span className="flex items-center gap-1 text-[10px] text-[#66635F]">
+                          <Clock className="h-3 w-3 text-[#66635F]" />
                           {new Date(item.created_at).toLocaleDateString()}
                         </span>
                       ) : null}
                     </div>
-                    <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-slate-600 group-hover:text-slate-900">
+                    <p className="mt-3 line-clamp-3 text-xs sm:text-sm leading-relaxed text-[#66635F] group-hover:text-[#2F2F2F]">
                       {item.job_description}
                     </p>
                   </div>
@@ -682,8 +711,8 @@ export function Dashboard({ user }: DashboardProps) {
               })}
             </div>
           ) : (
-            <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
-              No evaluation memory recorded yet. Analyze a resume to save history!
+            <div className="mt-6 rounded-xl border border-dashed border-[#E6E0D8] bg-[#F8F6F2] p-6 text-center text-xs sm:text-sm text-[#66635F]">
+              No past evaluations recorded yet. Run a resume analysis to store evaluation memory!
             </div>
           )}
         </section>

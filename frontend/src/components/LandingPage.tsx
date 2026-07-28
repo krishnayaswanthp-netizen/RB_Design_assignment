@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
 import {
   AlertCircle,
   ArrowRight,
@@ -102,15 +103,15 @@ export function LandingPage({ session = null }: LandingPageProps) {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 font-sans text-slate-100 selection:bg-cyan-500 selection:text-white">
-      {/* Navigation Header */}
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur-md">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-2">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 shadow-md shadow-cyan-500/20">
-              <Sparkles className="h-5 w-5 text-white" />
+    <div className="min-h-screen bg-[#F8F6F2] font-sans text-[#2F2F2F] selection:bg-[#707B63]/20 selection:text-[#2F2F2F]">
+      {/* Editorial Navigation Bar */}
+      <header className="sticky top-0 z-50 border-b border-[#E6E0D8] bg-[#F8F6F2]/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-8.5 w-8.5 items-center justify-center rounded-lg bg-[#2F2F2F] text-[#F8F6F2]">
+              <Sparkles className="h-4 w-4" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-white">
+            <span className="font-serif text-2xl font-semibold tracking-tight text-[#2F2F2F] sm:text-3xl">
               AI Resume Screener
             </span>
           </div>
@@ -119,14 +120,14 @@ export function LandingPage({ session = null }: LandingPageProps) {
             <button
               type="button"
               onClick={handleHeroCta}
-              className="inline-flex items-center gap-2 rounded-xl bg-white/10 px-4 py-2 text-sm font-medium text-white transition hover:bg-white/20"
+              className="rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] px-4 py-2 text-xs sm:text-sm font-medium text-[#2F2F2F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
             >
               {isLoggedIn ? 'Go to Dashboard' : 'Login / Signup'}
             </button>
             <button
               type="button"
               onClick={handleHeroCta}
-              className="hidden rounded-xl bg-gradient-to-r from-cyan-400 to-blue-500 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90 sm:inline-block"
+              className="hidden rounded-xl bg-[#2F2F2F] px-5 py-2 text-xs sm:text-sm font-semibold text-[#F8F6F2] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] sm:inline-block"
             >
               {isLoggedIn ? 'Go to Dashboard' : 'Get Started'}
             </button>
@@ -135,127 +136,150 @@ export function LandingPage({ session = null }: LandingPageProps) {
       </header>
 
       {/* Hero Section */}
-      <section className="relative overflow-hidden px-6 pt-20 pb-24 md:pt-32 md:pb-36">
-        <div className="pointer-events-none absolute -top-40 left-1/2 -z-10 h-[500px] w-[700px] -translate-x-1/2 rounded-full bg-cyan-500/15 blur-3xl" />
-        <div className="pointer-events-none absolute top-40 right-10 -z-10 h-[400px] w-[400px] rounded-full bg-blue-600/15 blur-3xl" />
+      <section className="px-6 pt-20 pb-24 md:pt-28 md:pb-36">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          >
+            <div className="mx-auto mb-7 inline-flex items-center gap-2 rounded-full border border-[#E6E0D8] bg-[#F2EEE7] px-4 py-1.5 text-xs sm:text-sm font-medium tracking-wide text-[#66635F]">
+              <Sparkles className="h-3.5 w-3.5 text-[#707B63]" />
+              Tactile &amp; Objective Candidate Evaluation
+            </div>
 
-        <div className="mx-auto max-w-5xl text-center">
-          <div className="mx-auto mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-cyan-300 backdrop-blur-md">
-            <Sparkles className="h-4 w-4" />
-            Next-Gen Candidate Screening
-          </div>
+            {/* Dominant Hero Heading (Balanced Middle Ground) */}
+            <h1 className="font-serif text-5xl font-normal leading-[1.12] tracking-tight text-[#2F2F2F] sm:text-6xl md:text-7xl">
+              Objective Resume Screening &amp; Fit Analysis
+            </h1>
 
-          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-6xl md:text-7xl leading-tight">
-            AI-Powered Resume Screening &amp; Fit Analysis
-          </h1>
+            {/* Comfortable Reading Body Text (18-20px) */}
+            <p className="mx-auto mt-7 max-w-2xl text-lg leading-relaxed text-[#66635F] sm:text-xl font-light">
+              Replace subjective filtering with recruiter-level reasoning. Evaluate candidates directly against custom job requirements with calm, clear ATS scoring.
+            </p>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-slate-300 sm:text-xl leading-relaxed">
-            Eliminate manual resume filtering. Evaluate candidate applications against job requirements with objective ATS-style scoring and recruiter reasoning in seconds.
-          </p>
-
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <button
-              type="button"
-              onClick={handleHeroCta}
-              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 px-8 py-4 text-base font-bold text-slate-950 shadow-xl shadow-cyan-500/25 transition hover:scale-105 hover:shadow-cyan-500/40"
-            >
-              {isLoggedIn ? 'Go to Dashboard' : 'Get Started for Free'}
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          </div>
+            <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+              <button
+                type="button"
+                onClick={handleHeroCta}
+                className="inline-flex items-center gap-2.5 rounded-2xl bg-[#2F2F2F] px-8 py-3.5 text-sm sm:text-base font-semibold text-[#F8F6F2] shadow-[0_6px_24px_rgba(47,47,47,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
+              >
+                {isLoggedIn ? 'Go to Dashboard' : 'Get Started for Free'}
+                <ArrowRight className="h-4.5 w-4.5" />
+              </button>
+            </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Feature Highlights Grid */}
-      <section className="border-t border-white/10 bg-slate-900/50 py-20 px-6 backdrop-blur-sm">
+      <section className="border-t border-[#E6E0D8] bg-[#F2EEE7]/60 py-24 px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Engineered for Modern Recruiting
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-serif text-3xl font-normal tracking-tight text-[#2F2F2F] sm:text-4xl">
+              Crafted for Thoughtful Recruiting
             </h2>
-            <p className="mt-4 text-slate-400">
-              Powerful tools designed to accelerate your talent evaluation pipeline.
+            <p className="mt-3.5 text-sm leading-relaxed text-[#66635F] sm:text-base">
+              Essential tools designed to bring clarity and accuracy to your hiring workflow.
             </p>
           </div>
 
           <div className="mt-16 grid gap-8 md:grid-cols-3">
             {/* Feature 1 */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 transition hover:border-cyan-500/50 hover:bg-white/10">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-400">
-                <FileText className="h-7 w-7" />
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-8 shadow-[0_6px_24px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#F2EEE7] text-[#707B63]">
+                <FileText className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold text-white">Multi-Format Parsing</h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Upload resumes seamlessly in <strong>PDF</strong>, <strong>DOCX</strong>, or <strong>TXT</strong> format with instant client-side text extraction.
+              <h3 className="font-serif text-xl font-semibold text-[#2F2F2F] sm:text-2xl">Multi-Format Document Parsing</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#66635F]">
+                Parse candidate files seamlessly in <strong>PDF</strong>, <strong>DOCX</strong>, or <strong>TXT</strong> format with instant client-side text extraction.
               </p>
-            </div>
+            </motion.div>
 
             {/* Feature 2 */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 transition hover:border-cyan-500/50 hover:bg-white/10">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-500/10 text-blue-400">
-                <Brain className="h-7 w-7" />
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.1 }}
+              className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-8 shadow-[0_6px_24px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#F2EEE7] text-[#707B63]">
+                <Brain className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold text-white">LLM-Powered Reasoning</h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Deep ATS match score breakdown powered by LangChain and Llama 3 models, identifying exact skill overlaps and gaps.
+              <h3 className="font-serif text-xl font-semibold text-[#2F2F2F] sm:text-2xl">LLM Recruiter Reasoning</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#66635F]">
+                Deep fit breakdown powered by LangChain and Llama 3 models, articulating candidate strengths and missing requirements.
               </p>
-            </div>
+            </motion.div>
 
             {/* Feature 3 */}
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 transition hover:border-cyan-500/50 hover:bg-white/10">
-              <div className="mb-6 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-400">
-                <Zap className="h-7 w-7" />
+            <motion.div
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: 0.2 }}
+              className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-8 shadow-[0_6px_24px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-1"
+            >
+              <div className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-[#F2EEE7] text-[#707B63]">
+                <Zap className="h-6 w-6" />
               </div>
-              <h3 className="text-xl font-semibold text-white">Instant Candidate Matching</h3>
-              <p className="mt-3 text-sm leading-relaxed text-slate-300">
-                Objective criteria evaluation strictly mapped to your custom job descriptions without subjective recruiter bias.
+              <h3 className="font-serif text-xl font-semibold text-[#2F2F2F] sm:text-2xl">Instant Candidate Matching</h3>
+              <p className="mt-3 text-sm leading-relaxed text-[#66635F]">
+                Objective criteria evaluation strictly benchmarked against your role expectations without recruiter bias.
               </p>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Table (2 Tiers) */}
+      {/* Quiet Luxury Pricing Table (2 Tiers) */}
       <section className="py-24 px-6">
         <div className="mx-auto max-w-7xl">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              Simple, Transparent Pricing
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="font-serif text-3xl font-normal tracking-tight text-[#2F2F2F] sm:text-4xl">
+              Simple, Transparent Membership
             </h2>
-            <p className="mt-4 text-slate-400">
-              Choose the plan that fits your screening volume.
+            <p className="mt-3.5 text-sm leading-relaxed text-[#66635F] sm:text-base">
+              Select the plan that aligns with your evaluation volume.
             </p>
           </div>
 
           {error ? (
-            <div className="mx-auto mt-8 flex max-w-md items-center gap-2 rounded-2xl border border-red-500/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-              <AlertCircle className="h-5 w-5 shrink-0 text-red-400" />
+            <div className="mx-auto mt-8 flex max-w-md items-center gap-2.5 rounded-xl border border-[#A85A48]/30 bg-[#A85A48]/10 px-4 py-3 text-xs font-medium text-[#A85A48]">
+              <AlertCircle className="h-4 w-4 shrink-0 text-[#A85A48]" />
               <span>{error}</span>
             </div>
           ) : null}
 
-          <div className="mt-12 grid max-w-4xl mx-auto gap-8 lg:grid-cols-2">
+          <div className="mt-16 grid max-w-4xl mx-auto gap-8 lg:grid-cols-2">
             {/* Free Plan */}
-            <div className="flex flex-col justify-between rounded-3xl border border-white/10 bg-slate-900/60 p-8 shadow-xl">
+            <div className="flex flex-col justify-between rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-8 shadow-[0_6px_24px_rgba(47,47,47,0.03)] transition-all duration-300">
               <div>
-                <h3 className="text-2xl font-bold text-white">Free Plan</h3>
-                <p className="mt-2 text-sm text-slate-400">Great for trying out AI resume screening.</p>
+                <h3 className="font-serif text-2xl font-normal text-[#2F2F2F] sm:text-3xl">Free Plan</h3>
+                <p className="mt-2 text-xs sm:text-sm text-[#66635F]">Ideal for testing resume screening accuracy.</p>
                 <div className="mt-6 flex items-baseline">
-                  <span className="text-5xl font-extrabold text-white">$0</span>
-                  <span className="ml-2 text-slate-400">/month</span>
+                  <span className="font-serif text-5xl sm:text-6xl font-normal text-[#2F2F2F]">$0</span>
+                  <span className="ml-2 text-xs sm:text-sm text-[#66635F]">/month</span>
                 </div>
 
-                <ul className="mt-8 space-y-4 text-sm text-slate-300">
+                <ul className="mt-8 space-y-4 text-xs sm:text-sm text-[#66635F]">
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
+                    <Check className="h-4 w-4 text-[#707B63]" />
                     <span>5 Resume Evaluations</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
+                    <Check className="h-4 w-4 text-[#707B63]" />
                     <span>PDF, DOCX &amp; TXT Parsing</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
+                    <Check className="h-4 w-4 text-[#707B63]" />
                     <span>Basic ATS Fit Score &amp; Feedback</span>
                   </li>
                 </ul>
@@ -264,7 +288,7 @@ export function LandingPage({ session = null }: LandingPageProps) {
               <button
                 type="button"
                 onClick={handleFreePlanCta}
-                className="mt-8 w-full rounded-2xl border border-white/20 bg-white/5 py-3.5 text-sm font-semibold text-white transition hover:bg-white/10"
+                className="mt-10 w-full rounded-xl border border-[#E6E0D8] bg-[#FCFBF8] py-3.5 text-xs sm:text-sm font-semibold text-[#2F2F2F] shadow-[0_2px_8px_rgba(47,47,47,0.03)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#707B63]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
               >
                 {isLoggedIn
                   ? planTier === 'free'
@@ -275,35 +299,35 @@ export function LandingPage({ session = null }: LandingPageProps) {
             </div>
 
             {/* Pro Plan */}
-            <div className="relative flex flex-col justify-between rounded-3xl border-2 border-cyan-500 bg-gradient-to-b from-cyan-950/40 via-slate-900 to-slate-900 p-8 shadow-2xl shadow-cyan-500/20">
-              <div className="absolute -top-4 right-6 rounded-full bg-gradient-to-r from-cyan-400 to-blue-500 px-3 py-1 text-xs font-bold uppercase tracking-wider text-slate-950">
-                Most Popular
+            <div className="relative flex flex-col justify-between rounded-2xl border-2 border-[#707B63] bg-[#FCFBF8] p-8 shadow-[0_6px_24px_rgba(47,47,47,0.05)] transition-all duration-300">
+              <div className="absolute -top-3.5 right-6 rounded-full bg-[#707B63] px-3.5 py-1 text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-[#F8F6F2]">
+                Recommended
               </div>
 
               <div>
-                <h3 className="text-2xl font-bold text-white">Pro Plan</h3>
-                <p className="mt-2 text-sm text-cyan-200/80">For high-volume hiring managers &amp; recruiters.</p>
+                <h3 className="font-serif text-2xl font-normal text-[#2F2F2F] sm:text-3xl">Pro Plan</h3>
+                <p className="mt-2 text-xs sm:text-sm text-[#66635F]">For active recruiters &amp; hiring managers.</p>
                 <div className="mt-6 flex items-baseline">
-                  <span className="text-5xl font-extrabold text-white">$15</span>
-                  <span className="ml-2 text-slate-400">/month</span>
+                  <span className="font-serif text-5xl sm:text-6xl font-normal text-[#2F2F2F]">$15</span>
+                  <span className="ml-2 text-xs sm:text-sm text-[#66635F]">/month</span>
                 </div>
 
-                <ul className="mt-8 space-y-4 text-sm text-slate-200">
+                <ul className="mt-8 space-y-4 text-xs sm:text-sm text-[#2F2F2F]">
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
-                    <span className="font-semibold text-white">Unlimited Evaluations</span>
+                    <Check className="h-4 w-4 text-[#707B63]" />
+                    <span className="font-semibold text-[#2F2F2F]">Unlimited Evaluations</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
+                    <Check className="h-4 w-4 text-[#707B63]" />
                     <span>PDF, DOCX &amp; TXT Parsing</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
+                    <Check className="h-4 w-4 text-[#707B63]" />
                     <span>Priority AI Processing</span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <Check className="h-5 w-5 text-cyan-400" />
-                    <span>Saved Review History</span>
+                    <Check className="h-4 w-4 text-[#707B63]" />
+                    <span>Saved Evaluation History</span>
                   </li>
                 </ul>
               </div>
@@ -318,10 +342,10 @@ export function LandingPage({ session = null }: LandingPageProps) {
                     : () => navigate('/auth')
                 }
                 disabled={upgrading}
-                className="mt-8 flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-cyan-400 to-blue-500 py-3.5 text-sm font-bold text-slate-950 transition hover:opacity-90 shadow-lg shadow-cyan-500/25 disabled:cursor-not-allowed disabled:opacity-70"
+                className="mt-10 flex w-full items-center justify-center gap-2 rounded-xl bg-[#2F2F2F] py-3.5 text-xs sm:text-sm font-semibold text-[#F8F6F2] shadow-[0_4px_16px_rgba(47,47,47,0.08)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {upgrading ? (
-                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin text-[#F8F6F2]" />
                 ) : isLoggedIn ? (
                   planTier === 'pro' ? (
                     'Active Pro Plan'
@@ -337,9 +361,9 @@ export function LandingPage({ session = null }: LandingPageProps) {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 py-8 text-center text-sm text-slate-500">
-        <p>© {new Date().getFullYear()} AI Resume Screener. All rights reserved.</p>
+      {/* Editorial Footer */}
+      <footer className="border-t border-[#E6E0D8] py-10 text-center text-xs text-[#66635F]">
+        <p>© {new Date().getFullYear()} AI Resume Screener. Thoughtful Recruitment Technology.</p>
       </footer>
     </div>
   )
