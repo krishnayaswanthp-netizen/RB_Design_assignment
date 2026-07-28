@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { CreditCard, Home, Loader2, LogOut } from 'lucide-react'
+import { CreditCard, Home, Loader2, LogOut, User as UserIcon } from 'lucide-react'
 
 type HeaderProps = {
   planTier: string
@@ -47,6 +47,14 @@ export function Header({
         >
           <Home className="h-4 w-4 text-slate-600" />
           Landing Page
+        </Link>
+
+        <Link
+          to="/profile"
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-50"
+        >
+          <UserIcon className="h-4 w-4 text-slate-600" />
+          Profile
         </Link>
 
         {isPro && onManageBilling ? (

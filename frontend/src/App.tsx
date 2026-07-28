@@ -10,6 +10,7 @@ import {
 import { Auth } from './components/Auth'
 import { Dashboard } from './components/Dashboard'
 import { LandingPage } from './components/LandingPage'
+import { Profile } from './components/Profile'
 import { supabase } from './supabaseClient'
 
 function App() {
@@ -53,6 +54,14 @@ function App() {
           element={
             <ProtectedRoute session={session}>
               {session ? <Dashboard user={session.user} /> : null}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <ProtectedRoute session={session}>
+              {session ? <Profile user={session.user} /> : null}
             </ProtectedRoute>
           }
         />

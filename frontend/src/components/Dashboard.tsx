@@ -7,7 +7,9 @@ import {
   AlertCircle,
   ArrowUpRight,
   CheckCircle2,
+  Clock,
   FileText,
+  History,
   Loader2,
   Sparkles,
   UploadCloud,
@@ -28,6 +30,15 @@ type ReviewResult = {
   feedback: string
   usage_count: number
   plan_tier: string
+}
+
+type EvaluationHistoryItem = {
+  id: string
+  created_at?: string
+  job_description: string
+  match_score?: number
+  score?: number
+  feedback: string
 }
 
 type ResumeMode = 'upload' | 'paste'
@@ -55,6 +66,7 @@ export function Dashboard({ user }: DashboardProps) {
   const [loading, setLoading] = useState(false)
   const [upgrading, setUpgrading] = useState(false)
   const [managingBilling, setManagingBilling] = useState(false)
+  const [history, setHistory] = useState<EvaluationHistoryItem[]>([])
   const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const remaining = useMemo(() => Math.max(5 - usageCount, 0), [usageCount])
@@ -63,6 +75,9 @@ export function Dashboard({ user }: DashboardProps) {
   useEffect(() => {
     loadProfile()
     showPaymentNotice()
+    if (user?.id) {
+      fetchHistory()
+    }
   }, [user.id])
 
   async function loadProfile() {
@@ -76,6 +91,49 @@ export function Dashboard({ user }: DashboardProps) {
       setPlanTier(data.plan_tier ?? 'free')
       setUsageCount(data.usage_count ?? 0)
     }
+  }
+
+  async function fetchHistory() {
+    try {
+      // Query evaluations table first
+      const { data: evalData } = await supabase
+        .from('evaluations')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (evalData && evalData.length > 0) {
+        setHistory(evalData)
+        return
+      }
+
+      // Fallback to reviews table
+      const { data: reviewData } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+
+      if (reviewData) {
+        const formatted = reviewData.map((item) => ({
+          id: item.id,
+          created_at: item.created_at,
+          job_description: item.job_description,
+          score: extractScoreFromFeedback(item.feedback),
+          match_score: extractScoreFromFeedback(item.feedback),
+          feedback: item.feedback,
+        }))
+        setHistory(formatted)
+      }
+    } catch (err) {
+      console.warn('Failed to fetch history:', err)
+    }
+  }
+
+  function extractScoreFromFeedback(fb: string): number {
+    if (!fb) return 0
+    const match = fb.match(/Score:\s*(\d+)\/100/)
+    return match ? parseInt(match[1], 10) : 70
   }
 
   function showPaymentNotice() {
@@ -229,6 +287,22 @@ export function Dashboard({ user }: DashboardProps) {
       setResult(data)
       setUsageCount(data.usage_count)
       setPlanTier(data.plan_tier)
+
+      // Save to Supabase evaluations table for persistent memory
+      try {
+        await supabase.from('evaluations').insert([
+          {
+            user_id: user.id,
+            job_description: jobDescription,
+            match_score: data.score,
+            feedback: data.feedback,
+          },
+        ])
+      } catch (saveErr) {
+        console.warn('Failed to save evaluation memory:', saveErr)
+      }
+
+      fetchHistory()
     } catch (reviewError) {
       setError(
         reviewError instanceof Error
@@ -317,6 +391,24 @@ export function Dashboard({ user }: DashboardProps) {
 
   async function handleLogout() {
     await supabase.auth.signOut()
+  }
+
+  function loadHistoryItem(item: EvaluationHistoryItem) {
+    const scoreVal = item.match_score ?? item.score ?? 0
+    const feedbackStr =
+      typeof item.feedback === 'string'
+        ? item.feedback
+        : JSON.stringify(item.feedback, null, 2)
+
+    setJobDescription(item.job_description || '')
+    setResult({
+      success: true,
+      score: scoreVal,
+      feedback: feedbackStr,
+      usage_count: usageCount,
+      plan_tier: planTier,
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   return (
@@ -550,6 +642,51 @@ export function Dashboard({ user }: DashboardProps) {
             )}
           </section>
         </div>
+
+        {/* Evaluation History Section */}
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white/85 p-6 shadow-sm backdrop-blur">
+          <div className="flex items-center gap-2">
+            <History className="h-5 w-5 text-cyan-600" />
+            <h2 className="text-lg font-semibold text-slate-950">Evaluation Memory &amp; History</h2>
+          </div>
+          <p className="mt-1 text-sm text-slate-500">
+            Click on any past evaluation scan below to view its score and feedback.
+          </p>
+
+          {history.length > 0 ? (
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {history.map((item) => {
+                const score = item.match_score ?? item.score ?? 0
+                return (
+                  <div
+                    key={item.id}
+                    onClick={() => loadHistoryItem(item)}
+                    className="group cursor-pointer rounded-2xl border border-slate-200 bg-slate-50 p-4 transition hover:border-cyan-500 hover:bg-cyan-50/50 hover:shadow-md"
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="rounded-full bg-cyan-100 px-3 py-1 text-xs font-bold text-cyan-800">
+                        {score}% Match
+                      </span>
+                      {item.created_at ? (
+                        <span className="flex items-center gap-1 text-xs text-slate-400">
+                          <Clock className="h-3 w-3" />
+                          {new Date(item.created_at).toLocaleDateString()}
+                        </span>
+                      ) : null}
+                    </div>
+                    <p className="mt-3 line-clamp-3 text-xs leading-relaxed text-slate-600 group-hover:text-slate-900">
+                      {item.job_description}
+                    </p>
+                  </div>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="mt-6 rounded-xl border border-dashed border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-500">
+              No evaluation memory recorded yet. Analyze a resume to save history!
+            </div>
+          )}
+        </section>
       </div>
     </main>
   )
