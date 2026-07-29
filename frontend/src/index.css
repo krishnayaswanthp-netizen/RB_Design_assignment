@@ -25,3 +25,34 @@
 .font-sans {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
+
+@media print {
+  /* Hide navigation, sidebars, buttons, headers, footers, and upgrade cards */
+  nav, header, button, .no-print, .upgrade-banner, .sidebar {
+    display: none !important;
+  }
+
+  /* Reset main background and layout for printable document */
+  body, main, #root {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  /* Force report card container to occupy full width */
+  .evaluation-results-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  /* Prevent awkward page breaks inside result sections */
+  .result-section {
+    page-break-inside: avoid;
+    margin-bottom: 20px;
+  }
+}

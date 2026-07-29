@@ -472,7 +472,7 @@ export function Dashboard({ user }: DashboardProps) {
 
         {/* Upgrade Banner for Free Users */}
         {planTier === 'free' ? (
-          <section className="mb-8 flex flex-col gap-4 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-6 shadow-[0_6px_24px_rgba(47,47,47,0.03)] lg:flex-row lg:items-center lg:justify-between">
+          <section className="upgrade-banner mb-8 flex flex-col gap-4 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-6 shadow-[0_6px_24px_rgba(47,47,47,0.03)] lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h2 className="font-serif text-xl font-semibold text-[#2F2F2F] sm:text-2xl">
                 Upgrade to Pro Membership ($15/mo)
@@ -510,7 +510,7 @@ export function Dashboard({ user }: DashboardProps) {
           {/* Resume & Job Description Input Form */}
           <form
             onSubmit={handleReview}
-            className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]"
+            className="no-print rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]"
           >
             <div className="mb-6 flex items-center gap-2.5">
               <Sparkles className="h-4.5 w-4.5 text-[#707B63]" />
@@ -658,18 +658,29 @@ export function Dashboard({ user }: DashboardProps) {
           </form>
 
           {/* Hero ATS Result Screen */}
-          <section className="rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
-            <h2 className="font-serif text-2xl font-semibold text-[#2F2F2F] sm:text-3xl">ATS Evaluation Result</h2>
+          <section className="evaluation-results-card rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
+            <div className="mb-4 flex items-center justify-between border-b border-[#E6E0D8] pb-3 no-print">
+              <span className="text-xs font-semibold uppercase tracking-wider text-[#66635F]">
+                ATS Evaluation Result
+              </span>
+              <button
+                type="button"
+                onClick={() => window.print()}
+                className="inline-flex items-center gap-1.5 rounded-xl bg-[#2F2F2F] px-3.5 py-1.5 text-xs font-semibold text-[#F8F6F2] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
+              >
+                📄 Download PDF Report
+              </button>
+            </div>
 
             {result ? (
               <motion.div
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.35 }}
-                className="mt-6 space-y-6"
+                className="mt-4 space-y-6"
               >
                 {/* Circular Score Gauge & Readout */}
-                <div className="flex flex-col items-center rounded-2xl border border-[#E6E0D8] bg-[#F8F6F2] p-6 text-center">
+                <div className="result-section flex flex-col items-center rounded-2xl border border-[#E6E0D8] bg-[#F8F6F2] p-6 text-center">
                   <div className="relative flex h-32 w-32 items-center justify-center">
                     <svg className="h-full w-full -rotate-90 transform" viewBox="0 0 36 36">
                       <path
@@ -697,7 +708,7 @@ export function Dashboard({ user }: DashboardProps) {
                 </div>
 
                 {/* Recruiter Feedback Details */}
-                <div className="rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] p-5">
+                <div className="result-section rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] p-5">
                   <h3 className="mb-3 font-serif text-sm font-semibold uppercase tracking-wider text-[#66635F]">
                     Recruiter Reasoning &amp; Breakdown
                   </h3>
@@ -707,7 +718,7 @@ export function Dashboard({ user }: DashboardProps) {
                 </div>
               </motion.div>
             ) : (
-              <div className="mt-8 rounded-xl border border-dashed border-[#E6E0D8] bg-[#F8F6F2] p-8 text-center text-xs sm:text-sm leading-relaxed text-[#66635F]">
+              <div className="mt-6 rounded-xl border border-dashed border-[#E6E0D8] bg-[#F8F6F2] p-8 text-center text-xs sm:text-sm leading-relaxed text-[#66635F]">
                 Upload a candidate resume and job description to generate fit score, strengths, and recruiter breakdown.
               </div>
             )}
@@ -715,7 +726,7 @@ export function Dashboard({ user }: DashboardProps) {
         </div>
 
         {/* Evaluation Memory History Section */}
-        <section className="mt-10 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
+        <section className="no-print mt-10 rounded-2xl border border-[#E6E0D8] bg-[#FCFBF8] p-7 shadow-[0_6px_24px_rgba(47,47,47,0.03)]">
           <div className="flex items-center gap-2.5">
             <History className="h-4.5 w-4.5 text-[#707B63]" />
             <h2 className="font-serif text-2xl font-semibold text-[#2F2F2F] sm:text-3xl">Evaluation Memory &amp; History</h2>
