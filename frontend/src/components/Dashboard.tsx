@@ -52,6 +52,54 @@ type UploadedResume = {
 const apiBaseUrl = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8000'
 const acceptedResumeTypes = '.pdf,.docx,.txt'
 
+function CopyableItem({ text, label }: { text: string; label?: string }) {
+  const [copied, setCopied] = useState(false)
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
+  return (
+    <div className="flex justify-between items-center p-3 rounded-xl bg-[#FCFBF8] border border-[#E6E0D8] mb-2 group hover:border-[#707B63]/40 transition-colors">
+      <span className="text-sm text-[#2F2F2F] font-medium leading-normal">{text}</span>
+      <button
+        type="button"
+        onClick={handleCopy}
+        className="no-print ml-3 text-xs px-2.5 py-1 bg-[#F2EEE7] border border-[#E6E0D8] rounded-lg hover:bg-[#E6E0D8]/60 transition-all font-semibold text-[#2F2F2F] shadow-sm shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
+      >
+        {copied ? '✓ Copied!' : label ? `📋 ${label}` : '📋 Copy'}
+      </button>
+    </div>
+  )
+}
+
+function parseFeedbackItems(feedback: string): string[] {
+  if (!feedback) return []
+  const lines = feedback.split('\n')
+  const items: string[] = []
+
+  for (const line of lines) {
+    const trimmed = line.trim()
+    if (!trimmed) continue
+    const isBullet = /^[-*•\d+.]+\s+/.test(trimmed)
+    const cleaned = trimmed.replace(/^[-*•\d+.]+\s*/, '').trim()
+
+    if (
+      cleaned.length > 5 &&
+      !cleaned.endsWith(':') &&
+      !cleaned.toLowerCase().startsWith('score:') &&
+      !cleaned.toLowerCase().startsWith('suggested resume')
+    ) {
+      if (isBullet || items.length > 0) {
+        items.push(cleaned)
+      }
+    }
+  }
+  return items
+}
+
 export function Dashboard({ user }: DashboardProps) {
   const [planTier, setPlanTier] = useState('free')
   const [usageCount, setUsageCount] = useState(0)
@@ -451,6 +499,10 @@ export function Dashboard({ user }: DashboardProps) {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  const feedbackItems = useMemo(() => {
+    return result ? parseFeedbackItems(result.feedback) : []
+  }, [result])
+
   return (
     <main className="min-h-screen bg-[#F8F6F2] font-sans text-[#2F2F2F] selection:bg-[#707B63]/20 selection:text-[#2F2F2F]">
       <Header
@@ -707,7 +759,7 @@ export function Dashboard({ user }: DashboardProps) {
                   </div>
                 </div>
 
-                {/* Recruiter Feedback Details */}
+                {/* Recruiter Feedback Details & Copyable Suggestions */}
                 <div className="result-section rounded-xl border border-[#E6E0D8] bg-[#F8F6F2] p-5">
                   <h3 className="mb-3 font-serif text-sm font-semibold uppercase tracking-wider text-[#66635F]">
                     Recruiter Reasoning &amp; Breakdown
@@ -715,6 +767,19 @@ export function Dashboard({ user }: DashboardProps) {
                   <div className="whitespace-pre-wrap text-sm sm:text-base leading-relaxed text-[#2F2F2F]">
                     {result.feedback}
                   </div>
+
+                  {feedbackItems.length > 0 ? (
+                    <div className="mt-6 border-t border-[#E6E0D8] pt-4">
+                      <span className="mb-3 block text-xs font-semibold uppercase tracking-wider text-[#66635F]">
+                        Suggested Resume Bullet Points (Copy &amp; Paste)
+                      </span>
+                      <div className="space-y-2">
+                        {feedbackItems.map((item, idx) => (
+                          <CopyableItem key={idx} text={item} />
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
                 </div>
               </motion.div>
             ) : (
