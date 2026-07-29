@@ -69,7 +69,7 @@ function CopyableItem({ text, label }: { text: string; label?: string }) {
         onClick={handleCopy}
         className="no-print ml-3 text-xs px-2.5 py-1 bg-[#F2EEE7] border border-[#E6E0D8] rounded-lg hover:bg-[#E6E0D8]/60 transition-all font-semibold text-[#2F2F2F] shadow-sm shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
       >
-        {copied ? '✓ Copied!' : label ? `📋 ${label}` : '📋 Copy'}
+        {copied ? 'âœ“ Copied!' : label ? `ðŸ“‹ ${label}` : 'ðŸ“‹ Copy'}
       </button>
     </div>
   )
@@ -83,8 +83,8 @@ function parseFeedbackItems(feedback: string): string[] {
   for (const line of lines) {
     const trimmed = line.trim()
     if (!trimmed) continue
-    const isBullet = /^[-*•\d+.]+\s+/.test(trimmed)
-    const cleaned = trimmed.replace(/^[-*•\d+.]+\s*/, '').trim()
+    const isBullet = /^[-*â€¢\d+.]+\s+/.test(trimmed)
+    const cleaned = trimmed.replace(/^[-*â€¢\d+.]+\s*/, '').trim()
 
     if (
       cleaned.length > 5 &&
@@ -720,7 +720,7 @@ export function Dashboard({ user }: DashboardProps) {
                 onClick={() => window.print()}
                 className="inline-flex items-center gap-1.5 rounded-xl bg-[#2F2F2F] px-3.5 py-1.5 text-xs font-semibold text-[#F8F6F2] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#1A1A1A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#707B63]"
               >
-                📄 Download PDF Report
+                ðŸ“„ Download PDF Report
               </button>
             </div>
 
