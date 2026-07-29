@@ -74,12 +74,33 @@ export function Dashboard({ user }: DashboardProps) {
   const canAnalyze = jobDescription.trim().length > 0 && resumeText.trim().length > 0
 
   useEffect(() => {
+    async function fetchPersistentUsage() {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession()
+        const token = sessionData.session?.access_token
+        if (!token) return
+
+        const res = await fetch(`${apiBaseUrl}/api/user/usage`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          if (typeof data.credits_used === 'number') {
+            setUsageCount((prev) => Math.max(prev, data.credits_used))
+          }
+        }
+      } catch (err) {
+        console.error('Failed to fetch persistent usage:', err)
+      }
+    }
+
     loadProfile()
+    fetchPersistentUsage()
     showPaymentNotice()
     if (user?.id) {
       fetchHistory()
     }
-  }, [user.id])
+  }, [user?.id])
 
   async function loadProfile() {
     const { data } = await supabase
@@ -88,10 +109,31 @@ export function Dashboard({ user }: DashboardProps) {
       .eq('id', user.id)
       .maybeSingle()
 
-    if (data) {
-      setPlanTier(data.plan_tier ?? 'free')
-      setUsageCount(data.usage_count ?? 0)
+    if (data?.plan_tier) {
+      setPlanTier(data.plan_tier)
     }
+
+    const tableUsage = data?.usage_count ?? 0
+
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const accessToken = sessionData.session?.access_token
+      if (accessToken) {
+        const res = await fetch(`${apiBaseUrl}/api/user/usage`, {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        if (res.ok) {
+          const usageData = await res.json()
+          const trackerUsage = typeof usageData.credits_used === 'number' ? usageData.credits_used : 0
+          setUsageCount(Math.max(tableUsage, trackerUsage))
+          return
+        }
+      }
+    } catch (err) {
+      console.warn('Failed to fetch user usage from backend:', err)
+    }
+
+    setUsageCount((prev) => Math.max(prev, tableUsage))
   }
 
   async function fetchHistory() {
@@ -273,8 +315,8 @@ export function Dashboard({ user }: DashboardProps) {
 
       const data = await response.json()
 
-      if (response.status === 403) {
-        setError('Free tier limit reached! Upgrade to Pro to continue.')
+      if (response.status === 403 || response.status === 429) {
+        setError(data.detail ?? 'Credit limit reached! Upgrade to Pro to continue.')
         return
       }
 

@@ -1,3 +1,4 @@
+import hashlib
 import logging
 import os
 
@@ -35,9 +36,18 @@ supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
 security = HTTPBearer()
 
 
-async def get_auth_user_id(
+def get_email_hash(email: str) -> str:
+    return hashlib.sha256(email.lower().strip().encode("utf-8")).hexdigest()
+
+
+class AuthUser(BaseModel):
+    id: str
+    email: str
+
+
+async def get_auth_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
-) -> str:
+) -> AuthUser:
     token = credentials.credentials
     try:
         user_res = supabase.auth.get_user(token)
@@ -46,7 +56,10 @@ async def get_auth_user_id(
                 status_code=401,
                 detail="Invalid or expired authentication token.",
             )
-        return user_res.user.id
+        return AuthUser(
+            id=user_res.user.id,
+            email=user_res.user.email or "",
+        )
     except HTTPException:
         raise
     except Exception as exc:
@@ -54,6 +67,12 @@ async def get_auth_user_id(
             status_code=401,
             detail=f"Authentication error: {str(exc)}",
         ) from exc
+
+
+async def get_auth_user_id(
+    auth_user: AuthUser = Depends(get_auth_user),
+) -> str:
+    return auth_user.id
 
 
 app = FastAPI()
@@ -82,16 +101,50 @@ def health_check():
     return {"status": "ok", "message": "API running"}
 
 
+@app.get("/api/user/usage")
+async def get_user_usage(auth_user: AuthUser = Depends(get_auth_user)):
+    email_hash = get_email_hash(auth_user.email)
+    res = supabase.table("usage_tracker").select("credits_used").eq("email_hash", email_hash).execute()
+    credits_used = res.data[0]["credits_used"] if res.data and len(res.data) > 0 else 0
+    return {"credits_used": credits_used, "limit": 5}
+
+
 @app.post("/api/review")
-def review_resume(payload: ReviewRequest, auth_user_id: str = Depends(get_auth_user_id)):
-    ensure_request_user(payload.user_id, auth_user_id)
+def review_resume(
+    payload: ReviewRequest,
+    auth_user: AuthUser = Depends(get_auth_user),
+):
+    ensure_request_user(payload.user_id, auth_user.id)
 
     user = get_user(payload.user_id)
     plan_tier = user.get("plan_tier", "free")
     usage_count = int(user.get("usage_count") or 0)
 
-    if plan_tier == "free" and usage_count >= 5:
-        raise HTTPException(status_code=403, detail="Free tier limit reached")
+    # Compute SHA-256 email hash for usage tracking
+    user_email = auth_user.email
+    email_hash = get_email_hash(user_email) if user_email else None
+
+    credits_used = 0
+    if email_hash:
+        try:
+            tracker_res = (
+                supabase.table("usage_tracker")
+                .select("credits_used")
+                .eq("email_hash", email_hash)
+                .execute()
+            )
+            if tracker_res.data and len(tracker_res.data) > 0:
+                credits_used = int(tracker_res.data[0].get("credits_used") or 0)
+        except Exception as tracker_err:
+            logger.warning(f"Error querying usage_tracker: {tracker_err}")
+
+    effective_usage = max(usage_count, credits_used)
+
+    if plan_tier == "free" and effective_usage >= 5:
+        raise HTTPException(
+            status_code=429,
+            detail="Credit limit reached (5/5 scans used). Account re-registration does not reset credits.",
+        )
 
     try:
         pipeline = build_screening_pipeline()
@@ -115,8 +168,20 @@ def review_resume(payload: ReviewRequest, auth_user_id: str = Depends(get_auth_u
     stored_feedback = f"Score: {score}/100\n\n{feedback}"
     insert_review(payload, stored_feedback)
 
-    updated_usage_count = usage_count + 1
+    updated_usage_count = effective_usage + 1
     update_user_usage(payload.user_id, updated_usage_count)
+
+    # Update or insert usage_tracker for persistent email hash credits
+    if email_hash:
+        try:
+            supabase.table("usage_tracker").upsert(
+                {
+                    "email_hash": email_hash,
+                    "credits_used": updated_usage_count,
+                }
+            ).execute()
+        except Exception as tracker_upsert_err:
+            logger.warning(f"Error updating usage_tracker: {tracker_upsert_err}")
 
     return {
         "success": True,
@@ -177,6 +242,7 @@ def create_portal_session(
 
     return {"url": portal_session.url}
 
+
 @app.post("/webhook")
 async def stripe_webhook(request: Request):
     if not STRIPE_WEBHOOK_SECRET:
@@ -211,6 +277,43 @@ async def stripe_webhook(request: Request):
         )
 
     return {"status": "success"}
+
+
+@app.delete("/api/user/delete")
+async def delete_account(
+    user_id: str,
+    auth_user_id: str = Depends(get_auth_user_id),
+):
+    ensure_request_user(user_id, auth_user_id)
+
+    try:
+        # Delete user evaluations if evaluations table exists
+        try:
+            supabase.table("evaluations").delete().eq("user_id", user_id).execute()
+        except Exception as exc:
+            logger.warning(f"Evaluations cleanup skipped: {exc}")
+
+        # Delete user reviews if reviews table exists
+        try:
+            supabase.table("reviews").delete().eq("user_id", user_id).execute()
+        except Exception as exc:
+            logger.warning(f"Reviews cleanup skipped: {exc}")
+
+        # Delete user record
+        try:
+            supabase.table("users").delete().eq("id", user_id).execute()
+        except Exception as exc:
+            logger.warning(f"Users table cleanup skipped: {exc}")
+
+        # Delete user from Supabase Auth via Service Role admin client
+        supabase.auth.admin.delete_user(user_id)
+
+        return {"status": "success", "message": "Account deleted successfully"}
+    except Exception as exc:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error deleting account: {str(exc)}",
+        ) from exc
 
 
 def ensure_request_user(request_user_id: str, auth_user_id: str) -> None:
